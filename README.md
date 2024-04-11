@@ -1,2 +1,2 @@
 # Code2.Services.Syslog
-Syslog service and tools
+Syslog services and tools for rfc3164, rfc5424 messages
