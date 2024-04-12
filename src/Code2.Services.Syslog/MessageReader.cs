@@ -36,8 +36,8 @@ namespace Code2.Services.Syslog
 
 		public DateTime ReadUntilAsDate(char search, string[] dateFormats)
 		{
-			int minReads = dateFormats.Min(x => x.Length);
-			string dateString = ReadUntil(search, minReads);
+			int minReadLength = dateFormats.Min(x => x.Length);
+			string dateString = ReadUntil(search, minReadLength);
 			return DateTime.TryParseExact(dateString, dateFormats, Thread.CurrentThread.CurrentCulture, System.Globalization.DateTimeStyles.None, out DateTime result)
 				? result : default;
 		}

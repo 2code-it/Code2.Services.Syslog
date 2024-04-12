@@ -63,6 +63,13 @@ namespace Code2.Services.Syslog
 
 			var message = new Rfc5424Message();
 
+			var codes = reader.ReadPri();
+
+			message.SeverityCode = codes.severityCode;
+			message.FacilityCode = codes.facilityCode;
+			message.Version = reader.ReadUntilAsByte(' ');
+			message.TimeStamp = reader.ReadUntilAsDate(' ', _rfc5424DateFormats);
+			message.Host = reader.ReadUntil(' ');
 			message.AppName = reader.ReadUntil(' ');
 			message.ProcId = reader.ReadUntil(' ');
 			message.MsgId = reader.ReadUntil(' ');
