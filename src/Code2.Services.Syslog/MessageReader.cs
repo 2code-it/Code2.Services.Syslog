@@ -24,7 +24,6 @@ namespace Code2.Services.Syslog
 		{
 			_streamReader.Read();
 			byte pri = ReadUntilAsByte('>');
-			_streamReader.Read();
 			return ((byte)Math.Floor(pri / 8.0), (byte)(pri % 8));
 		}
 
@@ -80,13 +79,15 @@ namespace Code2.Services.Syslog
 				if (data is null) break;
 				list.Add(data);
 			}
+			if (Peek() == ' ') Read();
 			return list.ToArray();
 		}
 
 		private StructuredData? ReadStructuredDataBlock()
 		{
-			int chr = Read();
+			int chr = Peek();
 			if (chr != '[') return null;
+			Read();
 			StructuredData structuredData = new StructuredData();
 			structuredData.Id = ReadUntil(' ');
 
@@ -106,6 +107,7 @@ namespace Code2.Services.Syslog
 				Read();
 				return null;
 			}
+			if (Peek() == ' ') Read();
 
 			string paramName = ReadUntil('=');
 			char quote = (char)Read();

@@ -1,4 +1,5 @@
-﻿using System.Collections.Specialized;
+﻿using System;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 
@@ -25,7 +26,8 @@ namespace Code2.Services.Syslog
 		public virtual T GetMessage(byte[] bytes)
 		{
 			if (typeof(T) == typeof(Rfc5424Message)) return (T)ByteArrayToRfc5424Message(bytes);
-			return (T)ByteArrayToRfc3164Message(bytes);
+			if (typeof(T) == typeof(Rfc3164Message)) return (T)ByteArrayToRfc3164Message(bytes);
+			throw new NotSupportedException($"Message type {typeof(T)} not supported");
 		}
 
 		protected object ByteArrayToRfc3164Message(byte[] data)
@@ -73,7 +75,6 @@ namespace Code2.Services.Syslog
 			message.AppName = reader.ReadUntil(' ');
 			message.ProcId = reader.ReadUntil(' ');
 			message.MsgId = reader.ReadUntil(' ');
-			reader.Read();
 			message.StructuredData = reader.ReadStructuredData();
 			message.Text = reader.ReadToEnd();
 
