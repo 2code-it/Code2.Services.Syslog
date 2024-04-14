@@ -8,22 +8,22 @@ namespace Code2.Services.Syslog
 {
 	public class SyslogService<Treceive> : ISyslogService<Treceive>, IDisposable where Treceive : notnull
 	{
-		public SyslogService() : this(syslog_default_port) { }
-		public SyslogService(ushort udpPort) : this(udpPort, new MessageMapper<Treceive>()) { }
-		public SyslogService(ushort udpPort, MessageMapper<Treceive> messageMapper) : this(udpPort, messageMapper, new NetFactory()) { }
-		internal SyslogService(ushort udpPort, MessageMapper<Treceive> messageMapper, INetFactory netFactory)
+		public SyslogService() : this(new SyslogServiceOptions()) { }
+		public SyslogService(SyslogServiceOptions options) : this(options, new MessageMapper<Treceive>()) { }
+		public SyslogService(SyslogServiceOptions options, IMessageMapper<Treceive> messageMapper) : this(options, messageMapper, new NetFactory()) { }
+		internal SyslogService(SyslogServiceOptions options, IMessageMapper<Treceive> messageMapper, INetFactory netFactory)
 		{
-			_udpPort = udpPort;
+			_options = options;
 			_netFactory = netFactory;
 			_messageMapper = messageMapper;
+			if (_options.AutoStart) Start();
 		}
 
-		private readonly MessageMapper<Treceive> _messageMapper;
+		private readonly IMessageMapper<Treceive> _messageMapper;
 		private readonly INetFactory _netFactory;
-		private readonly ushort _udpPort;
 		private readonly object _lock = new object();
 
-		private const ushort syslog_default_port = 514;
+		private readonly SyslogServiceOptions _options;
 		private UdpClient? _udpClient;
 
 
@@ -31,7 +31,9 @@ namespace Code2.Services.Syslog
 
 		public void Start()
 		{
-			_udpClient = _netFactory.CreateUdpClient(_udpPort);
+			IPAddress address = IPAddress.Parse(_options.ListenAddress);
+			IPEndPoint endpoint = new IPEndPoint(address, _options.ListenPort);
+			_udpClient = _netFactory.CreateUdpClient(endpoint);
 			_udpClient.BeginReceive(_netFactory.CreateAsyncCallback(OnDataReceived), null);
 		}
 
