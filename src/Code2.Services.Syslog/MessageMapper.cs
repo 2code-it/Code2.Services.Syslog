@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Code2.Services.Syslog
 {
-	public class MessageMapper<T>
+	public class MessageMapper<T> : IMessageMapper<T>
 	{
 		public MessageMapper() : this(new MessageReaderFactory()) { }
 		public MessageMapper(IMessageReaderFactory messageReaderFactory)
